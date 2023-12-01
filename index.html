@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,6 +136,7 @@
             seconds = 0;
             updateTimerDisplay();
             clearInterval(timerInterval);
+            timerInterval = null; // Reset timerInterval to null
             reminders = reminders.concat(completedReminders); // 將已完成的提醒重新加入待提醒清單
             completedReminders = []; // 清空已完成提醒清單
             updateReminderList();
