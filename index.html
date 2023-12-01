@@ -199,6 +199,14 @@
                 });
             }
         }
+
+        // 清除提醒
+        function clearReminders() {
+            reminders = [];
+            completedReminders = [];
+            updateReminderList();
+            updateCompletedReminderList();
+        }
     </script>
 
 </body>
