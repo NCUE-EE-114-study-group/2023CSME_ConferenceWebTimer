@@ -7,66 +7,12 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f5f5f5;
-        }
-
-        .timer {
-            font-size: 4em;
-            margin: 20px 0;
-        }
-
-        .input-field {
-            width: 300px;
-        }
-
-        .buttons {
-            margin: 10px 0;
-        }
-
-        .btn{
-            margin-top: 8px;
-        }
-        
-        .reminder-lists {
-            width: 300px;
-            margin-top: 20px;
-        }
-
-        .reminder-lists strong {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .reminder-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            animation: fadeIn 0.3s;
-        }
-
-        .reminder-item.completed {
-            background-color: #e0e0e0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-
+    <a id="header__logo" href="https://github.com/NCUE-EE-114-study-group/2023CSME_ConferenceWebTimer">
+        <img src="./img/github-mark.svg" alt="">
+    </a>
     <div class="container">
         <div class="timer" id="timer">00:00</div>
         <div class="row">
@@ -77,15 +23,14 @@
         <div class="buttons">
             <a class="waves-effect waves-light btn" onclick="addReminder()"><i class="material-icons left">add_alarm</i>新增提醒</a>
             <a class="waves-effect waves-light btn red" onclick="clearReminders()"><i class="material-icons left">clear_all</i>清除所有提醒</a>
+            <!-- 暗色模式切換按鈕 -->
+            <a class="waves-effect waves-light btn black" id="darkmodebtn" onclick="changeDarkmodebtn(1)"><i class="material-icons left">brightness_4</i>暗色模式</a>
         </div>
         <div class="buttons">
             <a class="waves-effect waves-light btn green" onclick="startTimer()"><i class="material-icons left">play_arrow</i>開始</a>
             <a class="waves-effect waves-light btn orange" onclick="pauseTimer()"><i class="material-icons left">pause</i>暫停</a>
             <!-- 重製:將已完成的提醒重新加入待提醒清單 -->
             <a class="waves-effect waves-light btn blue" onclick="resetTimer()"><i class="material-icons left">refresh</i>重設碼表</a>
-            <!-- 清除整個網站狀態(全新重新整理網頁) -->
-            <!-- <a class="waves-effect waves-light btn black" onclick="location.reload(true)"><i class="material-icons left">refresh</i>重新整理網頁</a> -->
-            <!-- 將碼表顯示切換按鈕 -->
             <a class="waves-effect waves-light btn black" id="zoombtn" onclick="changeZoombtn(1)"><i class="material-icons left">zoom_in</i>放大碼表</a>
         </div>
         <div class="reminder-lists">
@@ -93,177 +38,7 @@
             <div id="completedReminderList"><strong>已完成提醒：</strong><div class="reminder-item">無</div></div>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        let seconds = 0; // 計時器秒數
-        let timerInterval; // 計時器的間隔ID
-        let reminders = []; // 儲存未觸發提醒的陣列
-        let completedReminders = []; // 儲存已觸發提醒的陣列
-
-        // 啟動計時器
-        function startTimer() {
-            // 偵測是否已經啟動計時器，若已啟動則不重複啟動
-            if (timerInterval) {
-                return;
-            }
-
-            // 跳出通知訊息
-            Swal.fire({
-                title: '開始計時!',
-                icon: 'success',
-                timer: 2000,
-                timerProgressBar: true
-            });
-            
-            timerInterval = setInterval(function () {
-                seconds++;
-                updateTimerDisplay();
-                checkReminders(); // 檢查並觸發提醒
-            }, 1000);
-        }
-
-        // 暫停計時器
-        function pauseTimer() {
-            // 跳出通知訊息
-            Swal.fire({
-                title: '你已暫停!',
-                timer: 2000,
-                timerProgressBar: true
-            });
-            clearInterval(timerInterval);
-            timerInterval = null; // 重置 timerInterval 變數
-        }
-
-        // 重置計時器
-        function resetTimer() {
-            seconds = 0;
-            updateTimerDisplay();
-            clearInterval(timerInterval);
-            timerInterval = null; // Reset timerInterval to null
-            reminders = reminders.concat(completedReminders); // 將已完成的提醒重新加入待提醒清單
-            completedReminders = []; // 清空已完成提醒清單
-            updateReminderList();
-            updateCompletedReminderList();
-        }
-
-        // 更新計時器顯示
-        function updateTimerDisplay() {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            const formattedTime = padZero(minutes) + ":" + padZero(remainingSeconds);
-            document.getElementById("timer").innerText = formattedTime;
-        }
-
-        // 數字補零函數
-        function padZero(number) {
-            return number < 10 ? "0" + number : number;
-        }
-
-        // 新增提醒
-        function addReminder() {
-            const reminderInput = document.getElementById("reminderInput");
-            const reminderTime = parseInt(reminderInput.value, 10);
-
-            if (!isNaN(reminderTime) && reminderTime > 0) {
-                reminders.push(reminderTime * 60); // 轉換成秒並加入提醒清單
-                reminderInput.value = ''; // 清空輸入框
-                updateReminderList();
-            }
-        }
-
-        // 檢查並觸發提醒
-        function checkReminders() {
-            for (let i = 0; i < reminders.length; i++) {
-                if (seconds === reminders[i]) {
-                    showAlert();
-                    completedReminders.push(reminders[i]); // 將觸發的提醒移動到已完成清單
-                    reminders.splice(i, 1); // 從提醒清單中移除
-                    updateReminderList();
-                    updateCompletedReminderList(); // 更新已完成提醒的UI
-                }
-            }
-        }
-
-        // 顯示提醒彈窗
-        function showAlert() {
-            Swal.fire({
-                title: '時間到!',
-                text: '提醒訊息',
-                icon: 'success',
-                timer: 5000,
-                timerProgressBar: true
-            });
-        }
-
-        // 更新提醒清單UI
-        function updateReminderList() {
-            const reminderList = document.getElementById("reminderList");
-            reminderList.innerHTML = '<strong>提醒清單：</strong>';
-
-            if (reminders.length === 0) {
-                reminderList.innerHTML += '<div class="reminder-item">無</div>';
-            } else {
-                reminders.forEach(function (reminder, index) {
-                    const listItem = document.createElement('div');
-                    listItem.className = 'reminder-item';
-                    listItem.innerHTML = Math.floor(reminder / 60) + '分';
-                    reminderList.appendChild(listItem);
-                });
-            }
-        }
-
-        // 更新已完成提醒清單UI
-        function updateCompletedReminderList() {
-            const completedList = document.getElementById("completedReminderList");
-            completedList.innerHTML = '<strong>已完成提醒：</strong>';
-
-            if (completedReminders.length === 0) {
-                completedList.innerHTML += '<div class="reminder-item">無</div>';
-            } else {
-                completedReminders.forEach(function (reminder) {
-                    const listItem = document.createElement('div');
-                    listItem.className = 'reminder-item completed';
-                    listItem.innerHTML = Math.floor(reminder / 60) + '分';
-                    completedList.appendChild(listItem);
-                });
-            }
-        }
-
-        // 清除提醒
-        function clearReminders() {
-            // 跳出通知訊息
-            Swal.fire({
-                title: '已清除所有提醒!',
-                icon: 'success',
-                timer: 2000,
-                timerProgressBar: true
-            });
-            reminders = [];
-            completedReminders = [];
-            updateReminderList();
-            updateCompletedReminderList();
-        }
-
-        // 當按下放大按鈕，就將其切換成縮小按鈕，反覆切換顯示大小
-        function changeZoombtn(io) {
-            // io = 1 放大
-            // io = 0 縮小
-            var x = document.getElementById("zoombtn");
-            if (io == 1) {
-                document.getElementById('timer').style.fontSize='10em'; // 更新font-size
-                x.innerHTML = '<i class="material-icons left">zoom_out</i>縮小碼表';
-                document.getElementById('timer').className='center-align'; // 更新class center-align
-                x.onclick = function () { changeZoombtn(0); };
-            } else {
-                document.getElementById('timer').style.fontSize='4em'; // 更新font-size
-                x.innerHTML = '<i class="material-icons left">zoom_in</i>放大碼表';
-                document.getElementById('timer').className='timer'; // 更新class
-                x.onclick = function () { changeZoombtn(1); };
-            }
-        }
-
-    </script>
-
+    <script src="./js/main.js"></script>
 </body>
 </html>
