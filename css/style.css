@@ -1,0 +1,72 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+#header__logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fac365;
+    padding: 30px;
+    padding-left: 40px;
+    padding-right: 20px;
+    padding-bottom: 40px;
+    border-radius: 0 0 0 100px;
+}
+
+#header__logo>img {
+    width: 45px;
+}
+
+
+.timer {
+    font-size: 4em;
+    margin: 20px 0;
+}
+
+.input-field {
+    width: 300px;
+}
+
+.buttons {
+    margin: 10px 0;
+}
+
+.btn{
+    margin-top: 8px;
+}
+
+.reminder-lists {
+    width: 300px;
+    margin-top: 20px;
+}
+
+.reminder-lists strong {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.reminder-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    animation: fadeIn 0.3s;
+}
+
+.reminder-item.completed {
+    background-color: #e0e0e0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
